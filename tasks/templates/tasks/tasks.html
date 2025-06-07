@@ -1,46 +1,62 @@
-{% extends 'base.html' %}
-
-{% block title %}Your Tasks{% endblock %}
+{% extends "base.html" %}
+{% block title %}Home – Task Manager{% endblock %}
 
 {% block content %}
-<h2 class="mb-4">Your Tasks</h2>
+  <h2 class="mb-4">Your Tasks</h2>
 
-<ul class="list-group fade-in">
-  {% for task in tasks %}
-    <li class="list-group-item d-flex justify-content-between align-items-center
-        {% if task.status == 'todo' %}list-group-item-secondary
-        {% elif task.status == 'in_progress' %}list-group-item-info
-        {% elif task.status == 'Done' %}list-group-item-success
-        {% endif %}">
-      <div>
-        <strong>{{ task.title }}</strong> - {{ task.description }}
-        <small class="text-muted d-block">{{ task.created_at|date:"M d, Y" }}</small>
+  {% if tasks %}
+    {% for task in tasks %}
+      <div class="task-card">
+        <div class="task-header">
+          <h5>{{ task.title }}</h5>
+
+          <div class="d-flex align-items-center">
+            <span
+              class="priority-badge
+                    {% if task.priority == 'High' %}priority-high{% endif %}
+                    {% if task.priority == 'Medium' %}priority-medium{% endif %}
+                    {% if task.priority == 'Low' %}priority-low{% endif %}"
+            >
+              {{ task.priority }}
+            </span>
+
+            <div class="task-buttons ms-3">
+              <a href="{% url 'edit_task' task.id %}"
+                class="btn btn-sm btn-outline-primary"
+              >
+                Edit
+              </a>
+              <a href="{% url 'delete_task' task.id %}"
+                class="btn btn-sm btn-outline-danger"
+                onclick="return confirm('Delete this task?');"
+              >
+                Delete
+              </a>
+            </div>
+          </div>
+        </div>
+
+        <div class="task-body">
+          <p>{{ task.description }}</p>
+          {% if task.is_complete %}
+            <a href="{% url 'toggle_task' task.id %}"
+              class="btn complete-btn complete-true"
+            >
+              Completed
+            </a>
+          {% else %}
+            <a href="{% url 'toggle_task' task.id %}"
+              class="btn complete-btn complete-false"
+            >
+              Mark Complete
+            </a>
+          {% endif %}
+        </div>
       </div>
-      <div class="d-flex align-items-center">
-        <form method="POST" action="{% url 'update_status' task.id %}" class="me-2" title="Change Status">
-          {% csrf_token %}
-          <select name="status" class="form-select form-select-sm" onchange="this.form.submit()">
-            <option value="todo" {% if task.status == 'todo' %}selected{% endif %}>To Do</option>
-            <option value="in_progress" {% if task.status == 'in_progress' %}selected{% endif %}>In Progress</option>
-            <option value="Done" {% if task.status == 'Done' %}selected{% endif %}>Done</option>
-          </select>
-        </form>
-        <a href="{% url 'delete_task' task.id %}" class="btn btn-sm btn-danger" title="Delete Task">🗑️</a>
-      </div>
-    </li>
-  {% empty %}
-    <li class="list-group-item">No tasks yet.</li>
-  {% endfor %}
-</ul>
+    {% endfor %}
+  {% else %}
+    <p class="text-center text-muted">No tasks found. <a href="{% url 'add_task' %}">Add one now.</a></p>
+  {% endif %}
 
-<style>
-  .fade-in {
-    animation: fadeIn 0.6s ease-in;
-  }
-
-  @keyframes fadeIn {
-    from { opacity: 0; transform: translateY(10px); }
-    to { opacity: 1; transform: translateY(0); }
-  }
-</style>
+  <button id="backToTop" title="Back to top">↑</button>
 {% endblock %}

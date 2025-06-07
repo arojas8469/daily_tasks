@@ -1,0 +1,24 @@
+.edit-card {
+    max-width: 600px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+.edit-card .card-header,
+.edit-card .card-body,
+.edit-card .card-footer {
+    border-radius: 0;
+}
+
+.edit-card .card-body {
+    padding: 2rem;
+}
+
+.edit-card .card-footer a:hover {
+    color: #0d6efd; 
+}
+
+.edit-card .form-control:focus,
+.edit-card .form-select:focus {
+    border-color: #0d6efd;
+    box-shadow: 0 0 0 0.2rem rgba(13, 110, 253, 0.25);
+}

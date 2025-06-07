@@ -1,0 +1,74 @@
+{% extends 'base.html' %}
+{% load static widget_tweaks %}
+
+{% block title %}Contact Us{% endblock %}
+
+{% block content %}
+    <h2>Contact Us</h2>
+
+    <img
+        src="{% static 'css/img/anthonyportfolio.png' %}"
+        alt="Anthony in uniform"
+        class="img-thumbnail mb-3"
+        width="150"
+    />
+
+    <p class="lead">
+        Hi! I'm Anthony, a full-stack dev learning Django. I love building task apps.
+    </p>
+
+    <p>
+        <a
+            href="https://github.com/arojas8469"
+            target="_blank"
+        >
+            Github: @arojas8469
+        </a>
+    </p>
+
+    <p>If you have any questions, please fill out the form below:</p>
+
+    <form method="post">
+        {% csrf_token %}
+
+        <div class="mb-3">
+            <label
+                class="form-label"
+                for="{{ form.name.id_for_label }}"
+            >
+                {{ form.name.label }}
+            </label>
+            {{ form.name|add_class:"form-control" }}
+            {{ form.name.errors }}
+        </div>
+
+        <div class="mb-3">
+            <label
+                class="form-label"
+                for="{{ form.email.id_for_label }}"
+            >
+                {{ form.email.label }}
+            </label>
+            {{ form.email|add_class:"form-control" }}
+            {{ form.email.errors }}
+        </div>
+
+        <div class="mb-3">
+            <label
+                class="form-label"
+                for="{{ form.message.id_for_label }}"
+            >
+                {{ form.message.label }}
+            </label>
+            {{ form.message|add_class:"form-control" }}
+            {{ form.message.errors }}
+        </div>
+
+        <button
+            type="submit"
+            class="btn btn-primary"
+        >
+            Send
+        </button>
+    </form>
+{% endblock %}
