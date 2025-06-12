@@ -15,47 +15,36 @@
               class="priority-badge
                     {% if task.priority == 'High' %}priority-high{% endif %}
                     {% if task.priority == 'Medium' %}priority-medium{% endif %}
-                    {% if task.priority == 'Low' %}priority-low{% endif %}"
+                    {% if task.priority == 'Low' %}priority-low{% endif %}
+              "
             >
               {{ task.priority }}
             </span>
-
-            <div class="task-buttons ms-3">
-              <a href="{% url 'edit_task' task.id %}"
-                class="btn btn-sm btn-outline-primary"
-              >
-                Edit
-              </a>
-              <a href="{% url 'delete_task' task.id %}"
-                class="btn btn-sm btn-outline-danger"
-                onclick="return confirm('Delete this task?');"
-              >
-                Delete
-              </a>
-            </div>
           </div>
         </div>
 
         <div class="task-body">
           <p>{{ task.description }}</p>
-          {% if task.is_complete %}
+
+          {% if task.completed %}
             <a href="{% url 'toggle_task' task.id %}"
-              class="btn complete-btn complete-true"
-            >
-              Completed
+                class="btn complete-btn complete-true">
+                Completed
             </a>
           {% else %}
             <a href="{% url 'toggle_task' task.id %}"
-              class="btn complete-btn complete-false"
-            >
+                class="btn complete-btn complete-false">
               Mark Complete
             </a>
           {% endif %}
+
         </div>
       </div>
     {% endfor %}
   {% else %}
-    <p class="text-center text-muted">No tasks found. <a href="{% url 'add_task' %}">Add one now.</a></p>
+    <p class="text-center text-muted">
+      No tasks found. <a href="{% url 'add_task' %}">Add one now.</a>
+    </p>
   {% endif %}
 
   <button id="backToTop" title="Back to top">↑</button>
