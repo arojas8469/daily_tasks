@@ -1,51 +1,154 @@
-{% extends "base.html" %}
-{% block title %}Home – Task Manager{% endblock %}
+{% extends 'base.html' %}
+{% load static %}
+{% load get_item %}
+
+{% block title %}Your Tasks{% endblock %}
 
 {% block content %}
-  <h2 class="mb-4">Your Tasks</h2>
+  <div class="text-center mb-4">
+    <form method="get" class="d-inline-flex align-items-center gap-2 flex-wrap justify-content-center">
+      <input type="text" name="q" value="{{ request.GET.q }}" placeholder="Search title…" class="form-control" />
+      <select name="status" class="form-select">
+        <option value="">Status</option>
+        <option value="todo" {% if request.GET.status == 'todo' %}selected{% endif %}>To Do</option>
+        <option value="in_progress" {% if request.GET.status == 'in_progress' %}selected{% endif %}>In Progress</option>
+        <option value="done" {% if request.GET.status == 'done' %}selected{% endif %}>Done</option>
+      </select>
+      <button type="submit" class="btn btn-primary">Filter</button>
+    </form>
 
-  {% if tasks %}
-    {% for task in tasks %}
-      <div class="task-card">
-        <div class="task-header">
-          <h5>{{ task.title }}</h5>
+    <div class="d-flex justify-content-between align-items-center mt-4 mb-2">
+      <a href="?year={{ prev_year }}&month={{ prev_month }}" class="btn btn-outline-secondary btn-sm">&laquo; Previous</a>
+      <h2 class="mb-0">📅 {{ current_month }} {{ year }}</h2>
+      <a href="?year={{ next_year }}&month={{ next_month }}" class="btn btn-outline-secondary btn-sm">Next &raquo;</a>
+    </div>
+  </div>
 
-          <div class="d-flex align-items-center">
-            <span
-              class="priority-badge
-                    {% if task.priority == 'High' %}priority-high{% endif %}
-                    {% if task.priority == 'Medium' %}priority-medium{% endif %}
-                    {% if task.priority == 'Low' %}priority-low{% endif %}
-              "
-            >
-              {{ task.priority }}
-            </span>
-          </div>
-        </div>
-
-        <div class="task-body">
-          <p>{{ task.description }}</p>
-
-          {% if task.completed %}
-            <a href="{% url 'toggle_task' task.id %}"
-                class="btn complete-btn complete-true">
-                Completed
-            </a>
-          {% else %}
-            <a href="{% url 'toggle_task' task.id %}"
-                class="btn complete-btn complete-false">
-              Mark Complete
-            </a>
-          {% endif %}
-
-        </div>
-      </div>
-    {% endfor %}
-  {% else %}
-    <p class="text-center text-muted">
-      No tasks found. <a href="{% url 'add_task' %}">Add one now.</a>
-    </p>
+  {% if cal %}
+  <div class="calendar mb-5">
+    <table class="table table-bordered text-center">
+      <thead class="table-light">
+        <tr>
+          <th>Sun</th><th>Mon</th><th>Tue</th><th>Wed</th><th>Thu</th><th>Fri</th><th>Sat</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for week in cal %}
+          <tr>
+            {% for day in week %}
+              {% if day == 0 %}
+                <td></td>
+              {% else %}
+                <td>
+                  <strong>{{ day }}</strong>
+                  {% with tasks=tasks_by_day|get_item:day %}
+                    {% if tasks %}
+                      <span 
+                        class="badge bg-success d-block mt-1"
+                        data-bs-toggle="tooltip"
+                        title="{% for t in tasks %}{{ t.title }}{% if not forloop.last %}, {% endif %}{% endfor %}">
+                        {{ tasks|length }} task{{ tasks|length|pluralize }}
+                      </span>
+                    {% endif %}
+                  {% endwith %}
+                </td>
+              {% endif %}
+            {% endfor %}
+          </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+  <script>
+    document.addEventListener('DOMContentLoaded', function () {
+      const tooltipTriggerList = document.querySelectorAll('[data-bs-toggle="tooltip"]');
+      [...tooltipTriggerList].forEach(el => new bootstrap.Tooltip(el));
+    });
+  </script>
   {% endif %}
 
-  <button id="backToTop" title="Back to top">↑</button>
+  <!-- Task Cards Section (unchanged) -->
+  <div class="cards-grid">
+    {% for task in tasks %}
+      <div class="card flip-card">
+        <input type="checkbox" class="flip-toggle" hidden />
+        <div class="flip-card-inner">
+          <div class="flip-card-front card-front">
+            <div class="card-content">
+              <h5 class="task-title">{{ task.title }}</h5>
+            </div>
+
+            <div class="badges mt-2">
+              {% if task.priority == 'High' %}
+                <span class="badge bg-danger">High</span>
+              {% elif task.priority == 'Medium' %}
+                <span class="badge bg-warning text-dark">Medium</span>
+              {% else %}
+                <span class="badge bg-success">Low</span>
+              {% endif %}
+
+              {% if task.status == 'todo' %}
+                <span class="badge bg-secondary text-dark">{{ task.get_status_display }}</span>
+              {% elif task.status == 'in_progress' %}
+                <span class="badge bg-info text-dark">{{ task.get_status_display }}</span>
+              {% else %}
+                <span class="badge bg-success">{{ task.get_status_display }}</span>
+              {% endif %}
+
+              {% if task.category == 'Work' %}
+                <span class="badge bg-primary">Work</span>
+              {% elif task.category == 'Personal' %}
+                <span class="badge bg-info text-dark">Personal</span>
+              {% else %}
+                <span class="badge bg-secondary text-dark">Other</span>
+              {% endif %}
+            </div>
+
+            {% if task.due_date %}
+              <div class="due-date mt-1">
+                Due: {{ task.due_date|date:"M j, Y" }}<br>
+                <small class="text-muted">
+                  {% if task.due_date > today %}
+                    Due in {{ task.due_date|timeuntil }}
+                  {% elif task.due_date == today %}
+                    Due today
+                  {% else %}
+                    Overdue by {{ task.due_date|timesince }}
+                  {% endif %}
+                </small>
+              </div>
+            {% endif %}
+
+            <div class="card-actions mt-3">
+              <form action="{% url 'toggle_star' task.id %}" method="post" class="star-form me-auto">
+                {% csrf_token %}
+                <button type="submit" class="star-btn">
+                  {% if user in task.stars.all %}★{% else %}☆{% endif %}
+                  {{ task.stars.count }}
+                </button>
+              </form>
+
+              <a href="{% url 'edit_task' task.id %}" class="btn btn-sm btn-warning">Edit</a>
+              <a href="{% url 'delete_task' task.id %}" class="btn btn-sm btn-danger ms-1">Delete</a>
+              <form method="post" action="{% url 'update_status' task.id %}" class="d-inline-block ms-1">
+                {% csrf_token %}
+                <input type="hidden" name="status"
+                       value="{% if task.status != 'done' %}done{% else %}todo{% endif %}">
+                <button type="submit" class="btn btn-sm btn-success">
+                  {% if task.status == 'done' %}Completed{% else %}Complete{% endif %}
+                </button>
+              </form>
+            </div>
+          </div>
+
+          <div class="flip-card-back card-back">
+            <h5>Description</h5>
+            <p class="task-desc">{{ task.description }}</p>
+          </div>
+        </div>
+      </div>
+    {% empty %}
+      <p class="no-tasks text-center">No tasks yet.</p>
+    {% endfor %}
+  </div>
 {% endblock %}

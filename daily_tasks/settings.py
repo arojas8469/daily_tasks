@@ -106,7 +106,7 @@ AUTH_PASSWORD_VALIDATORS = [
 
 LANGUAGE_CODE = 'en-us'
 
-TIME_ZONE = 'UTC'
+TIME_ZONE = 'America/Los_Angeles'
 
 USE_I18N = True
 
@@ -129,3 +129,6 @@ EMAIL_PORT = 587
 EMAIL_USE_TLS = True
 EMAIL_HOST_USER = 'anthony.rojas099@gmail.com'
 EMAIL_HOST_PASSWORD = 'qeugdsxttrrrdhmv'
+LOGIN_REDIRECT_URL = '/tasks/'
+LOGOUT_REDIRECT_URL = '/accounts/login/'
+

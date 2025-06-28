@@ -4,71 +4,47 @@
 {% block title %}Contact Us{% endblock %}
 
 {% block content %}
-    <h2>Contact Us</h2>
+<div class="row justify-content-center mb-4">
+    <div class="col-md-6">
+        <div class="card shadow-sm text-center">
+        <div class="card-body">
+            <img src="{% static 'css/anthonyportfolio.png' %}" alt="Anthony in uniform" class="img-fluid rounded-circle" />
+            <h4 class="card-title">Anthony Rojas</h4>
+            <p class="card-text">👋 Hi there! I'm <strong>Anthony</strong>, a passionate full-stack developer currently mastering Django.  
+                I enjoy turning ideas into reality through clean, functional code.  
+                Feel free to reach out with questions, feedback, or collaboration opportunities!</p>
+            <div>
+                <a href="https://github.com/anthonyrojas" target="_blank" class="text-dark me-3"><i class="bi bi-github fs-4"></i></a>
+                <a href="https://linkedin.com/in/your-linkedin" target="_blank" class="text-primary me-3"><i class="bi bi-linkedin fs-4"></i></a>
+                <a href="mailto:anthony.rojas099@email.com" class="text-danger"><i class="bi bi-envelope-fill fs-4"></i></a>
+            </div>
+        </div>
+    </div>
+    </div>
+</div>
 
-    <img
-        src="{% static 'css/img/anthonyportfolio.png' %}"
-        alt="Anthony in uniform"
-        class="img-thumbnail mb-3"
-        width="150"
-    />
-
-    <p class="lead">
-        Hi! I'm Anthony, a full-stack dev learning Django. I love building task apps.
-    </p>
-
-    <p>
-        <a
-            href="https://github.com/arojas8469"
-            target="_blank"
-        >
-            Github: @arojas8469
-        </a>
-    </p>
-
-    <p>If you have any questions, please fill out the form below:</p>
-
-    <form method="post">
+<div class="row justify-content-center">
+    <div class="col-md-6">
+        <form method="post" novalidate>
         {% csrf_token %}
-
+        {{ form.non_field_errors }}
         <div class="mb-3">
-            <label
-                class="form-label"
-                for="{{ form.name.id_for_label }}"
-            >
-                {{ form.name.label }}
-            </label>
+            {{ form.name.label_tag }}
             {{ form.name|add_class:"form-control" }}
             {{ form.name.errors }}
-        </div>
-
-        <div class="mb-3">
-            <label
-                class="form-label"
-                for="{{ form.email.id_for_label }}"
-            >
-                {{ form.email.label }}
-            </label>
-            {{ form.email|add_class:"form-control" }}
-            {{ form.email.errors }}
-        </div>
-
-        <div class="mb-3">
-            <label
-                class="form-label"
-                for="{{ form.message.id_for_label }}"
-            >
-                {{ form.message.label }}
-            </label>
-            {{ form.message|add_class:"form-control" }}
-            {{ form.message.errors }}
-        </div>
-
-        <button
-            type="submit"
-            class="btn btn-primary"
-        >
-            Send
-        </button>
+    </div>
+    <div class="mb-3">
+        {{ form.email.label_tag }}
+        {{ form.email|add_class:"form-control" }}
+        {{ form.email.errors }}
+    </div>
+    <div class="mb-3">
+        {{ form.message.label_tag }}
+        {{ form.message|add_class:"form-control" }}
+        {{ form.message.errors }}
+    </div>
+    <button type="submit" class="btn btn-primary w-100">Send</button>
     </form>
+</div>
+</div>
 {% endblock %}
