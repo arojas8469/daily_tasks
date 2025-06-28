@@ -1,1 +1,1 @@
-web: gunicorn daily_tasks.wsgi --log-file -
+web: gunicorn daily_tasks.daily_tasks.wsgi --log-file -
